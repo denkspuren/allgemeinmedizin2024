@@ -1,0 +1,37 @@
+Title: Teach yourself everything there is to know about Java classes in 4 easy steps to become an expert programmer
+
+Intro:
+
+- Expert java language acquisition takes years by practice
+- You might never stumble across specific corners of the java language
+- The vast majority of textbooks doesn't cover Java in full detail
+- Books might be out of date
+- Thanks to Java excellent design documentation there is the java language specification
+- But you might not want to read 872 pdf pages (Java SE 21 Edition)
+- There is a much easier way, thanks to Javas reflection features
+- ChatGPT helps you capture the essence at high speed
+
+1. Let either Java or the docs tell you everything there is to know about classes
+- it's all about getting to know the methods for inspecting a class 
+- Do this to see the inspection methods: `jshell> class A {}  A.class.<tab key>`
+- Have a look into the docs https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/Class.html
+
+2. Summarize and cluster what you've found out
+- Create a spreadsheet or table with GoogleDoc Spreadsheets, Excel, Notion, ...
+- Columns: Category, method, short explanation, example link
+- Example link is for step 3
+- Fill out method name and short explanation: read doc in jshell or on website; ask ChatGPT for a short explanation
+- Here's a template for use with ChatGPT
+- Define categories; a category defines a logic group a method belongs to
+- sort table according to category
+
+3. Use ChatGPT to generate illustrative examples
+- Create a document with your favorite tool: markdown file/editor, Word, GoogleDocs, Notion, ...
+- Decide on entries in the table you wish to have illustrative examples for
+- Ask ChatGPT to generate an example with this template
+- If you like: try it out and verify ChatGPTs answer
+- Document ChatGPTs answer in your doc, set a link in your table to the example
+
+4. Store the result in your knowledge base
+- Whatever system you use e.g. Google Drive, Notion, Obsidian, store your knowledge in an approriate way in you knowledge base
+- You might have noticed in case you investigated more on the return types: this 4 easy steps apply alike for members, fields, methods, constructors, modules, packages, types, type variables, record components and annotations

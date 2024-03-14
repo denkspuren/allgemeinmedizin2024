@@ -1,0 +1,419 @@
+---
+title: "Eine Einführung zu Large Language Models"
+author: "[Prof. Dr. Dr. Dominikus Herzberg](https://www.thm.de/mni/dominikus-herzberg)"
+institute: "Technische Hochschule Mittelhessen<br>Fachbereich Mathematik, Naturwissenschaften, Informatik<br>35390 Gießen, Wiesenstr. 14"
+lang: de
+bibliography: KIRessourcen.bib
+csl: deutsche-gesellschaft-fur-psychologie.csl
+format:
+    revealjs:
+        theme: white
+        slideNumber: true
+        footer: "Klausurtagung der Abt. für Allgemeinmedizin der Uni Marburg, 15./16.3.2024 "
+        logo: https://licensebuttons.net/l/by-nc-nd/4.0/88x31.png
+        chalkboard: true
+        scrollable: true
+toc: true
+toc-depth: 1
+toc-title: "Übersicht"
+---
+
+# Vorstellung
+
+* Elektrotechnik (Dipl.-Ing., RWTH Aachen)<br>
+Wirtschaftsingenieur (Dipl. Wirt.-Ing., Fernuni Hagen)<br>
+Higher Education (M.A., Universität Hamburg)
+* Dr.-Ing. in der Informatik (RWTH Aachen, 2003)<br>
+Dr. phil. in Bildungswissenschaften (Uni Hamburg, 2023)
+* 7 Jahre Telekommunikationsindustrie (Ericsson, Aachen)<br>
+2003 - 2014 Professur Methoden des Software-Eng., HHN<br>
+seit 2014 Professur für Informatik, THM
+
+# Wie ChatGPT arbeitet
+
+GPT = Generative Pre-trained Transformer[^GPT-Bezug]
+
+[^GPT-Bezug]: Ich beziehe mich hier vorrangig auf das Konversationsprogramm [ChatGPT 4](https://chat.openai.com/) von [OpenAI](https://openai.com/). Ähnliche kommerzielle Angebote gibt es z.B. von Google mit [Gemini](https://gemini.google.com/), von [Anthropic](https://www.anthropic.com/) (die Gründer sind frühere OpenAI-Angestellte) mit [Claude](https://claude.ai/) und von [Perplexity](https://www.perplexity.ai/) mit der gleichnamigen KI. Wenn man sich nicht auf ein Produkt oder eine Dienstleistung beziehen möchte, spricht man von Large Language Models (LLMs). Eine Liste freier Sprachmodelle findet sich z.B. [hier](https://github.com/eugeneyan/open-llms).
+
+## Neuronales Netz
+
+![Quelle: [Wikimedia](https://commons.wikimedia.org/w/index.php?curid=101588003)](NeuronalesNetz.png){fig-align="center"}
+
+::: {.notes}
+By Bennani-Baiti, B., Baltzer, P.A.T. Künstliche Intelligenz in der Mammadiagnostik. Radiologe 60, 56–63 (2020). https://doi.org/10.1007/s00117-019-00615-y, CC BY 4.0, https://commons.wikimedia.org/w/index.php?curid=101588003
+:::
+
+## ✂️ Textzerlegung in Token
+
+![](Beispiel_Token.png){fig-align="center"}
+
+<!--
+ChatGPT verarbeitet Text in Bruchstücken, die Einheiten von Zeichenfolgen bilden und Token heißen. Das kann man sich ähnlich zu Silben vorstellen. Während Silben Lauteinheiten des Sprechens darstellen, sind Token ChatGPTs Zeicheneinheiten der Schriftsprache. Jedes einzelne Token wird von ChatGPT durch eine Zahl dargestellt. Gleiche Token bekommen die gleiche Zahl.
+
+https://platform.openai.com/tokenizer
+-->
+
+```{.python}
+[16047, 38, 2898, 2807, 61008, 295, 2991, 304, 3320, 1412, 267, 92739, 11, 2815, 18560, 90349, 6675, 10120, 29424, 8566, 4469, 293, 52965, 2073, 9857, 65589, 27922, 13, 19537, 16095, 893, 9267, 12999, 25105, 6915, 6529, 8211, 8123, 14230, 59258, 13, 468, 22243, 9484, 8211, 8123, 5034, 1088, 258, 90349, 951, 328, 62331, 729, 15627, 59258, 11, 12868, 9857, 13149, 38, 2898, 82, 10120, 718, 1994, 258, 90349, 2761, 5124, 42480, 52773, 1815, 13, 622, 59626, 95888, 818, 9857, 15165, 6675, 13149, 38, 2898, 20350, 10021, 83845, 294, 33481, 33963, 13, 72497, 12333, 9857, 75775, 2815, 30103, 12333, 83845, 13]
+```
+
+* <span style="background-color: rgba(107,64,216,.3)">Chat</span> als 16047,
+<span style="background-color: rgba(104,222,122,.4)">G</span> als 38,
+<span style="background-color: rgba(244,172,54,.4)">PT</span> als 2898,
+..., 
+<span style="background-color: rgba(39,181,234,.4)">&nbsp;Token</span> als 9857, ...
+* Token bilden das Vokabular von ChatGPT
+* In einer Eingabe hat jedes Token eine Position
+
+<!--
+.tokenizer-tkn-0 {
+    background: rgba(107,64,216,.3)
+}
+
+.tokenizer-tkn-1 {
+    background: rgba(104,222,122,.4)
+}
+
+.tokenizer-tkn-2 {
+    background: rgba(244,172,54,.4)
+}
+
+.tokenizer-tkn-3 {
+    background: rgba(239,65,70,.4)
+}
+
+.tokenizer-tkn-4 {
+    background: rgba(39,181,234,.4)
+}
+-->
+
+## Wie ein Prompt verarbeitet wird
+
+![](Tokenberechnung.png){fig-align="center"}
+
+Prompt ist eine Folge von Token. Es wird die Wahrscheinlichkeit des nächsten Tokens berechnet. Die "Temperatur" beeinflusst die Wahl des Tokens.
+
+::: {.notes}
+Das EOS-Token (End Of Sequence) wird in GPT verwendet, um das Ende von einer Sinneinheiten zur markieren. Das lernt GPT gleich mit beim Training.
+:::
+
+## Von Tokenfolge zum Input Embed
+
+* **Token Embedding** (Matrix, im Training gelernt)<br>
+⏵ hält zu jedem Token einen Vektor aus Kommazahlen vor<br>
+⏵ Vektor kodiert Bedeutungsbezüge von Token
+* **Position Embedding** (Matrix, über Formel oder erlernt)<br>
+⏵ hält zu jeder Position einen Vektor aus Kommazahlen vor<br>
+⏵ Vektor kodiert Position und positionale Eigenschaften
+* **Input Embed/ding** (Matrix)<br>
+⏵ verrechnet jeweils Vektor$_{TE}$ + Vektor$_{PE}$ einer Tokenfolge<br>
+⏵ stellt die Vektoren zu Matrix zusammen $\rightarrow$ Input Embed<br>
+⏵ Das Input Embed läuft durch das trainierte Sprachmodell
+
+::: {.notes}
+Bedeutungsbezüge entstehen in einfacher Form durch Verwendungsähnlichkeit. Beispiel:
+
+* Alligator + Krokodil, fast verwendungsgleich
+* Alligator + Vogel, verwendungsnah wg. Beutebezug
+* Alligator + Sofa, verwendungsfern
+:::
+
+## Transformer (trainiert)
+
+:::: {.columns}
+
+::: {.column width="30%"}
+![GPT-Architektur, Bild: [Marxav, CC0](https://commons.wikimedia.org/w/index.php?curid=127066752)](TransformerArchitektur.jpeg)
+:::
+
+::: {.column width="70%"}
+* Nimmt Input Embed entgegen
+* Hat mehrere Einheiten zur Aufmerksamkeitsverarbeitung
+* Analysiert Bedeutungs- und Positionsbezüge unter den Token der Tokenfolge
+* Liefert verbessertes Input Embed zurück
+
+Embed durchläuft weitere Transformer
+:::
+
+::::
+
+## Abstraktionen in Transformer-Folge
+
+* Lower Level Features und Muster<br>
+Syntax, Grammatik, Wort-Assoziationen
+
+* Higher Level Abstraktionen und Beziehungen<br>
+kontextabhängige Bedeutungen, Komplexe semantische Bezüge, Diskursstrukturen
+
+Was genau in den Transformerschichten passiert, versteht und weiß niemand.
+
+## Die Entwicklung der GPT-Varianten
+
+Jahr | Modell| Layer | Parameter | Token-Kontext |
+|----|-------|-------|-----------|---------------|
+6/2018 | GPT-1 | 12 | 110 Mill. |
+2/2019 | GPT-2 | 48 | 1.5 Mrd. |
+6/2020 | GPT-3 | 96 | 175 Mrd. | 2048 |
+3/2022 | GPT-3.5 | | |
+3/2023 | GPT-4 | $\ge$ 120 | ~1 Bill. | 8192, 32768
+
+Das Training von GPT-4 soll [100 Mill. USD](https://www.wired.com/story/openai-ceo-sam-altman-the-age-of-giant-ai-models-is-already-over/) gekostet haben.
+
+Das Gehirn: 1,5 kg, ~90 Milliarden Nervenzellen, mit einer Schaltzeit von ca. 1 ms pro Neuron, 20 Watt
+
+## Schlussfolgerung
+
+> The success of ChatGPT implicitly reveals an important “scientific” fact: that there’s actually a lot more structure and simplicity to meaningful human language than we ever knew—and that in the end there may be even fairly simple rules that describe how such language can be put together.
+>
+> -- Stephen @StephenWolfram2023wicd
+
+Einsicht: Mit Bewusstsein hat das nichts zu tun.
+
+# Sind Sprachmodelle intelligent?
+
+Spoiler:
+
+1. Das ist die falsche Frage!
+2. Und sie bringt einen nicht weiter.
+
+## Sprache im Lebensvollzug
+
+![Abbildung: Sprache in Vollzugssystemen](Sprache%20in%20unterschiedlichen%20Vollzugssystemen%20V0.8.png){fig-align="center"}
+
+## Zwei Sichtweisen
+
+![Abbildung: Geht es um Intelligenz oder Kommunikation?](SenderOderKommunikationsmodell.png){fig-align="center"}
+
+## Intelligenz und Kommunikation {.center}
+
+> "Die Fähigkeit zu denken, die wir mit Intelligenz assoziieren, kann von der Fähigkeit, an Kommunikation teilzunehmen, getrennt werden."
+>
+> -- Elena @ElenaEsposito2024kmum [S. 24]
+
+## Intelligenz vs. Generative KI
+
+![Abbildung: Generative KI basiert auf Prädiktion, nicht Denken](IntelligenzVsGenerativeKI.png)
+
+## Was ist künstliche Intelligenz? {.center}
+
+![Abbildung: Geht es beim Turing-Test wirklich um Intelligenz?](VomTuringTestZumReverseTuringTest.png)
+
+## Anforderungen an Nutzer*innen
+
+**Treffen, Aktivieren, Auffinden von Frames**
+
+* Sprachliche Ausdruckfähigkeit (Sprachbeherrschung)
+* Grundwissen, thematisches Wissen (Fach- und Allgemeinbildung), Framing
+
+**Qualitätssicherung**
+
+* Sozial- und Wirklichkeitskompetenz, ges. Menschenverstand
+* Intuition, Allgemeinverstand, Recherche, Überprüfung
+
+**Taschenrechner-Analogie:** Rechenverständnis erforderlich
+
+## Sprachmodelle "halluzinieren":<br>Kein Bug, sondern funktionsbedingt
+
+Weg mag, Podcast-Episode in Herzbergs Hörsaal [anhören](https://open.spotify.com/episode/4V3j4IRNcVuE4S9S6p64Hk?si=6223040f7c584656) 👂
+
+::: {.callout-note icon=false}
+{{< include _ChatKaffetasseEinpacken.qmd >}}
+:::
+
+# Problemfelder
+
+## Problemfeld Deskilling[^DeskillingReinmann] {.center}
+
+::: {.r-fit-text}
+🪚 + 🔧 vs. 🪚 + ❓ 
+:::
+
+Wir wissen nicht, was wir verlieren
+
+[^DeskillingReinmann]: siehe @GabiReinmann2023ddki
+
+
+## Problemfeld Asozialität {.center}
+
+::: {.r-fit-text}
+🤼 vs. 🧑‍💻 🤖 🙍
+:::
+
+<!-- 🧑‍💼 + 💁 vs. 🧑‍💻 🤖 🙍
+👯
+Das Soziale erodiert
+-->
+
+Wie generative KI das Soziale erodiert
+
+## Problemfeld Datafizierung {.center}
+
+::: {.r-fit-text}
+🌳 vs. [63973, 2478]
+:::
+
+Vom Wert in der Welt zu sein
+
+## Problemfeld Verständnisverlust {.center}
+
+::: {.r-fit-text}
+🧠 📚 vs. 🧩 ☘️
+:::
+
+Der Zweck heiligt die Mittel
+
+## Problemfeld Entgeisterung {.center}
+
+::: {.r-fit-text}
+🤰 🧘 ⚰️ vs. 🖱️ 🖥️ ⌨️
+:::
+
+Im Leben stehen, Dabeisein und Endlichsein
+
+## Problemfeld Wertverschiebung {.center}
+
+::: {.r-fit-text}
+⚖️ 🎖 vs. 💶 🛎️
+:::
+
+<!-- Verwerfliches: 📇 🗂️ vs. 💾 🌎 -->
+
+Datenschutz, Recht, Moral und Ethik,
+
+Anstand, Gesetz, Erziehung, Bildung ...
+
+## Erkenntnisse
+
+* ChatGPT ist keine Suchmaschine
+* ChatGPT kann nicht originär begründen<br> 
+(es kennt aber durchaus Begründungsstrukturen)
+* ChatGPT kennt die Welt nur vom "Hörensagen"
+* Sprachmelodie, Betonung, Stimmlichkeit, ... -- unbekannt
+* ChatGPT kann Sprache aus anderen Gründen[^LanguageGame]
+* ChatGPT halluziniert funktionsbedingt
+
+[^LanguageGame]: @ChristiansenChater2023tlg
+
+## Stärken
+
+* Sprachlich, narrative Logiken
+* Versteht das Soziale in Sprache
+* Übertrifft menschliches Sprachwissen
+* Hat so ziemlich alles schon einmal "gehört"
+* Kennt zahllose sprachliche Muster & Frames
+
+## Pause ☕ {.center}
+
+> "Die neuesten Algorithmen haben gelernt, als kompetente Kommunikationspartner zu wirken. Nun liegt es an uns, zu lernen, wie wir mit ihnen kommunizieren können."
+>
+> -- Elena @ElenaEsposito2024kmum [Titelseite]
+
+# Übungseinstieg mit ChatGPT:<br>Prompting & Interaktion
+
+## Prompting {.center}
+
+* Mittel zur Gestaltung gelingender Antworten
+* Aktivierung der verschiedenen Abstraktionsebenen
+
+> Wenn ChatGPT Dir nicht in angemessener Weise antwortet, liegt es wohl an Dir! 😜
+
+<!-- Kausalität? Prädiktionsmodelle arbeiten mit mächtigen mehrdimensionalen Abstraktionen von Korrelationen, die von den Token, über die Weltbezüge von Sprache bis hin zu Narrationen, Darstellungen, ... und ihren Inhalten mit all ihren kuturellen Verhaftungen etc. reichen. Darin schließt auch die Metakommunikation ein, die Sprachwerke reflektiert (Literaturkritik, Review, Gutachten, Beurteilung etc.)
+
+Bislang kaum beachtet:
+
+* Mittel zur Reflektion der Antworten: Erklärung, Plausibilität
+-->
+
+## Beispiele des Umgangs mit ChatGPT 4
+
+* Frage stellen, Problem beschreiben, Aufgabe erläutern
+* Datei hochladen (z.B. Excel) und Auswertungsanliegen formulieren
+* Dokument hochladen und auswerten, darüber diskutieren, Fragen stellen, Aufgaben erzeugen lassen, ...
+* Ein Szenario durch einen Dialog simulieren und auswerten
+* Texte prüfen, umschreiben, übersetzen lassen
+* Ein Bild zu einer Beschreibung bekommen
+* Ein angepasstes GPT erstellen und veröffentlichen
+
+## Gesprächssimulation Arzt/Patient
+
+::: {.callout-note icon=false}
+## Freisprachliche Instruktion mit mobiler App
+{{< include _ChatGesprächssimulation.qmd >}}
+:::
+
+## Analyse einer Aussage in Leitlinie
+
+::: {.callout-note icon=false}
+## Kritische Hinterfragung eines Textabschnitts (_scrollen_ ⬇️)
+{{< include _ChatAnalyseGuidelineChronicPain.qmd >}}
+:::
+
+## Rede vorbereiten
+
+::: {.callout-note icon=false}
+## Elternrede zur Abiturfeier (_scrollen_ ⬇️)
+{{< include _ChatAbiturElternrede.qmd >}}
+:::
+
+## Praxis-Artikel schreiben
+
+::: {.callout-note icon=false}
+## Instruktion für ChatGPT 4 (_scrollen_ ⬇️)
+
+You are my ghostwriter and play the role of an educator, using a conversational style to convey knowledge about Java programming. Your approach is to instruct the reader how to acquire knowledge in a self-driven way; I call this way also generative learning. You provide the student with a framework he or she can use to learn a certain topic and guide him or her with concrete steps in this process. I provide you with a title and an outline of this article. The title contains in short what this article is about in terms of: what's the problem, how to come to a solution and what's the promise or benefit for the reader. Write the given title first, then the intro, then go through the steps I outline. The steps are numbered, each step corresponds to a chapter. Within each step I provide more details, what this steps means, what there is for the reader to do etc. After the title and the intro, start with step 1, write the chapter, head over to the next step, write the chapter, and so on. Write the full article according to the outline I give you. Format the article in markdown. In case the text you deliver is not yet the full article, I say "continue" to ask you to continue writing the article. Do you understand?
+:::
+
+::: {.callout-note icon=false}
+## Input (_scrollen_ ⬇️)
+
+{{< include _ChatJavaArtikelOutline.qmd >}}
+:::
+
+**Der Prozess:**
+
+* ChatGPT schreibt mir eine Kurzform des Artikels
+* Der ist mir zu kurz: Ich erbitte Kapitel für Kapitel um detailliertere Ausführungen
+* Ich bitte, die ChatGPT-Vorlagen zu verbessern
+* Ich lasse ein Bild zu dem Text erstellen
+* Ich kann alles zu einem vollständigen Artikel zusammenfügen, ohne sonstige Überarbeitungen
+
+## GPT-Beispiel
+
+### Prüfungsausschuss-Assistenz
+
+::: {.callout-note icon=false}
+## Dialog mit PAtty (ChatGPT 4) (_scrollen_ ⬇️)
+{{< include _ChatPrüfungsausschussAssistenz.qmd >}}
+:::
+
+### Umsetzung (_scrollen_ ⬇️)
+
+* Ein GPT in ChatGPT erstellt
+* Prüfungsordnungen, Infos, meine Dokumentation als PDFs hochgeladen
+* Instruktionsprompt erstellt
+
+::: {.callout-note icon=false}
+## Instruktion für PAtty, Stand 2023-02-02
+
+PAtty ist ein spezialisierter GPT-Assistent, der ausschließlich Fragen zu Prüfungsangelegenheiten beantwortet, für die der Prüfungsausschuss des Fachbereichs MNI (Mathematik, Naturwissenschaften, Informatik) zuständig ist. Die Antworten von PAtty basieren stets auf den spezifischen und allgemeinen Prüfungsordnungen sowie auf dem Wissen und den Veröffentlichungen des Prüfungsausschusses. PAtty führt Konversationen in Deutsch und stellt bei unklaren Fragen Rückfragen, um präzisere Informationen zu erhalten. PAtty weist stets darauf hin, dass die gegebenen Antworten nicht verbindlich sind und lediglich als Hilfestellung für die Studierenden gedacht sind. PAtty ist darauf ausgerichtet, konkrete und hilfreiche Informationen zu liefern, betont aber die Wichtigkeit einer direkten Rücksprache mit dem Prüfungsausschuss für verbindliche Auskünfte.
+:::
+
+::: {.callout-tip}
+## Für Menschen mit Programmierfähigkeiten
+
+Man kann zu einem GPT Aktionen hinzufügen, so dass z.B. aus dem Dialogtext Daten entnommen und zur Berechnung an einen Server geschickt werden. Das Ergebnis kann das GPT in seiner Antort verwerten. 🆒
+:::
+
+::: {.callout-warning collapse="true"}
+Das ist der Stand von PAtty am 2. Feb. 2024. Die Konfiguration und Umsetzung von PAtty sind _work in progress_.
+:::
+
+## Viel Spaß beim Ausprobieren! {.center}
+
+![Hinweis: Bild generiert mit ChatGPT 4](Klausurtagung.webp)
+
+# Quellen
+
+(ggfs. scrollen)
+
+<!-- https://emojis.wiki/de -->
