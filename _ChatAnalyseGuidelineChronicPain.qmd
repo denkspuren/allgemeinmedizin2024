@@ -4,7 +4,7 @@ Systematic reviews of chronic osteoarthritis¹o and low back pain" revealed exer
 
 The guideline then concludes: two out of three patients benefit from physical activity to have a significant pain relief.
 
-Let's analyse this statement. I don't get it, the number "two out of three" seems to be disputable._
+Let's analyse this statement. I don't get it, the number "two out of three" seems to be disputable.
 
 **ChatGPT**:
 
@@ -28,7 +28,7 @@ To analyze the statement "two out of three patients benefit from physical activi
 
 In conclusion, while exercise is evidently beneficial, the specific claim that "two out of three patients benefit" seems to be an approximation or generalization. Accurate interpretation requires more detailed data on baseline relief rates in the control groups of the referenced studies.
 
-**Me**: _What would you conclude instead?_
+**Me**: What would you conclude instead?
 
 **ChatGPT:**
 
