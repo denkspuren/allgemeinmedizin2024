@@ -137,7 +137,7 @@ Embed durchläuft weitere Transformer
 
 ::::
 
-## Wie lernt ein LLM Sprache? {.center}
+## Wie lernt ein LLM Sprache?
 
 ![Abbildung: Lernen durch Korrelation und Prädiktion](PrinzipSelfSupervisedLearning.png)
 
