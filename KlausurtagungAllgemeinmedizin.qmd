@@ -137,6 +137,10 @@ Embed durchläuft weitere Transformer
 
 ::::
 
+## Wie lernt ein LLM Sprache? {.center}
+
+![Abbildung: Lernen durch Korrelation und Prädiktion](PrinzipSelbstu%CC%88berwachtesLernen.png)
+
 ## Abstraktionen in Transformer-Folge
 
 * Lower Level Features und Muster<br>
@@ -161,7 +165,7 @@ Das Training von GPT-4 soll [100 Mill. USD](https://www.wired.com/story/openai-c
 
 Das Gehirn: 1,5 kg, ~90 Milliarden Nervenzellen, mit einer Schaltzeit von ca. 1 ms pro Neuron, 20 Watt
 
-## Schlussfolgerung
+## Schlussfolgerung {visibility="hidden"}
 
 > The success of ChatGPT implicitly reveals an important “scientific” fact: that there’s actually a lot more structure and simplicity to meaningful human language than we ever knew—and that in the end there may be even fairly simple rules that describe how such language can be put together.
 >
