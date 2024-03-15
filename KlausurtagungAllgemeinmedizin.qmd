@@ -139,7 +139,7 @@ Embed durchläuft weitere Transformer
 
 ## Wie lernt ein LLM Sprache? {.center}
 
-![Abbildung: Lernen durch Korrelation und Prädiktion](PrinzipSelbstu%CC%88berwachtesLernen.png)
+![Abbildung: Lernen durch Korrelation und Prädiktion](PrinzipSelfSupervisedLearning.png)
 
 ## Abstraktionen in Transformer-Folge
 
